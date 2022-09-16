@@ -1,7 +1,9 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
 import {
+    CacheType,
     Client,
     Collection,
+    Interaction,
     MessageComponentInteraction,
 } from 'discord.js'
 import { ObjectId } from 'mongodb'
@@ -22,7 +24,7 @@ export interface Event {
     execute(otherOptions: otherOptions, ...any: any[]): Promise<void>
 }
 
-export type Interactions = MessageComponentInteraction
+export type Interactions = Interaction<CacheType>
 
 export interface User {
     _id: ObjectId
@@ -36,4 +38,17 @@ export interface User {
     typescript: number
     javascript: number
     general: number
+}
+export type UserAttribute = "c" | "cpp" | "c-sharp" | "rust" | "java" | "python" | "typescript" | "javascript" | "general"
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+        TOKEN: string
+        CLIENTID: string
+        GUILDID: string
+        RULES_ROLE_ID: string
+        KEY: string
+    }
+  }
 }

@@ -6,13 +6,15 @@ export const data = new SlashCommandBuilder()
         .setDescription('Replies with Pong!');
 
 export async function execute({ client }: otherOptions, interaction: Interactions){
+    if (!interaction.isCommand()) return
     let ping = Date.now() - interaction.createdTimestamp
     if (ping < 0) ping *= -1
-
-    const embed = new EmbedBuilder()
-        .setTitle('Latency')
-        .setDescription(`🏓**Latency** is \`${ping}ms\`.\n🏸**API Latency** is \`${Math.round(client.ws.ping)}ms\`.`)
-        .setColor(0xaaaaaa);
-    
-    interaction.reply({ embeds: [embed.toJSON()], ephemeral: true })
+ 
+    await interaction.reply({ embeds: [
+        new EmbedBuilder()
+            .setTitle('Latency')
+            .setDescription(`🏓**Latency** is \`${ping}ms\`.\n🏸**API Latency** is \`${Math.round(client.ws.ping)}ms\`.`)
+            .setColor(0xaaaaaa)
+            .toJSON()
+    ], ephemeral: true })
 }

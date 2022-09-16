@@ -1,5 +1,5 @@
 import { MongoClient, ObjectId } from 'mongodb'
-import { User } from './interfaces'
+import { User, UserAttribute } from './interfaces'
 
 class Database {
   client: MongoClient
@@ -40,6 +40,16 @@ class Database {
     const usersCollection = this.client.db('levels').collection('users')
     const userDoc = await usersCollection.findOne({ userId }) as User
     return userDoc
+  }
+
+  async addPoints(
+    userId: string,
+    attribute: UserAttribute
+  ) {
+    const usersCollection = this.client.db('levels').collection('users')
+    const obj: any = {}
+    obj[attribute] = 1
+    usersCollection.findOneAndUpdate({ userId }, { $inc: obj })
   }
 }
 

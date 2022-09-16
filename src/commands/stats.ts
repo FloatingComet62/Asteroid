@@ -6,6 +6,7 @@ export const data = new SlashCommandBuilder()
         .setDescription('See your stats');
 
 export async function execute({ database }: otherOptions, interaction: Interactions){
+    if (!interaction.isCommand()) return
     const { c, cpp, java, rust, javascript: js, typescript: ts, python: py, general: gen, "c-sharp": cs } = await database.getUser(interaction.user.id)
 
     const embed = new EmbedBuilder()
@@ -24,5 +25,5 @@ export async function execute({ database }: otherOptions, interaction: Interacti
         )
         .setColor(0xaaaaaa);
     
-    interaction.reply({ embeds: [embed.toJSON()], ephemeral: true })
+    await interaction.reply({ embeds: [embed.toJSON()], ephemeral: true })
 }

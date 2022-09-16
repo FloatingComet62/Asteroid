@@ -1,8 +1,8 @@
-import { Client, Intents, Collection } from 'discord.js'
-import { customClient, Command, Event } from './interfaces'
+import { Client, Collection } from 'discord.js'
+import { config } from 'dotenv'
 import { readdirSync } from 'fs'
 import { join } from 'path'
-import { config } from 'dotenv'
+import { Command, customClient, Event } from './interfaces'
 config()
 
 import db from './database'
@@ -11,7 +11,9 @@ const database = new db()
 database.connect()
 const client: customClient = new Client({
     intents: [
-        Intents.FLAGS.GUILDS
+        "Guilds",
+        "GuildMessages",
+        "GuildMembers"
     ]
 })
 
@@ -37,8 +39,8 @@ for(const file of eventFiles){
         event.execute(otherOptions, ...args)
     }
 
-	if(event.once) client.once(event.name, (...args: any[]) => eventExecuter(...args))
-	else client.on(event.name, (...args: any[]) => eventExecuter(...args))
+	if (event.once) client.once(event.name, eventExecuter)
+	else client.on(event.name, eventExecuter)
 }
 
 client.login(process.env.TOKEN)
