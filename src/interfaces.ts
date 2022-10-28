@@ -45,7 +45,6 @@ declare global {
             CLIENTID: string
             GUILDID: string
             RULES_ROLE_ID: string
-            LANGUAGE_GROUP_ID: string
             KEY: string
         }
     }

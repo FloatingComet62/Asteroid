@@ -30,20 +30,20 @@ export async function execute({ database }: otherOptions, interaction: Interacti
     // Init
     let error = false
     let content = `Adding Language ${languageName}`
-    interaction.reply({ content })
+    await interaction.reply({ content })
 
     // Channel
     const channel = await interaction.guild?.channels.create({
         name: languageName,
-        parent: process.env.LANGUAGE_GROUP_ID
+        parent: '1015525181906767892'
     })
     if (channel) content += `\n:white_check_mark: Created Channel <#${channel.id}>`
     else {
-        content += `\n:x: Failed to create Channel`
+        content += `\n:x: Failed to create channel`
         error = true
     }
 
-    interaction.editReply({ content })
+    await interaction.editReply({ content })
     if (error) return
 
     // Role integration
@@ -58,12 +58,12 @@ export async function execute({ database }: otherOptions, interaction: Interacti
         error = true
     }
 
-    interaction.editReply({ content })
+    await interaction.editReply({ content })
     if (error) return
 
     // Database integration
     await database.addLang(languageName, channel!.id, role!.id)
 
     content += `\n:white_check_mark: Updated database`
-    interaction.editReply({ content })
+    await interaction.editReply({ content })
 }

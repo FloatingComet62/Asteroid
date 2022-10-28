@@ -43,7 +43,7 @@ export async function execute({ database }: otherOptions, interaction: Interacti
 		content += `\n:white_check_mark: Channel deleted`
 	}
 
-	interaction.editReply({ content })
+	await interaction.editReply({ content })
 	if (error) return
 
 	// Role Segregation
@@ -58,12 +58,12 @@ export async function execute({ database }: otherOptions, interaction: Interacti
 		content += `\n:white_check_mark: Role deleted`
 	}
 
-	interaction.editReply({ content })
+	await interaction.editReply({ content })
 	if (error) return
 
 	// Database Segregation
 	await database.deleteLang(languageName)
 	content += `\n:white_check_mark: Updated database`
 
-	interaction.editReply({ content })
+	await interaction.editReply({ content })
 }

@@ -8,7 +8,7 @@ class Database {
     private static instance: Database
 
     private constructor() {
-        this.client = new MongoClient(process.env.KEY || '')
+        this.client = new MongoClient(process.env.KEY)
         this.levelCollection = this.client.db('userdata').collection('levels')
         this.languageCollection = this.client.db('languages').collection('languages')
         this.connect();
