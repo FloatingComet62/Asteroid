@@ -4,7 +4,6 @@ import {
     Client,
     Collection,
     Interaction,
-    MessageComponentInteraction,
 } from 'discord.js'
 import { ObjectId } from 'mongodb'
 import Database from './database'
@@ -29,26 +28,25 @@ export type Interactions = Interaction<CacheType>
 export interface User {
     _id: ObjectId
     userId: string
-    c: number
-    cpp: number
-    "c-sharp": number
-    rust: number
-    java: number
-    python: number
-    typescript: number
-    javascript: number
-    general: number
+    xp: number
 }
-export type UserAttribute = "c" | "cpp" | "c-sharp" | "rust" | "java" | "python" | "typescript" | "javascript" | "general"
+
+export interface Language {
+    _id: ObjectId
+    name: string
+    roleId: string
+    channelId: string
+}
 
 declare global {
-  namespace NodeJS {
-    interface ProcessEnv {
-        TOKEN: string
-        CLIENTID: string
-        GUILDID: string
-        RULES_ROLE_ID: string
-        KEY: string
+    namespace NodeJS {
+        interface ProcessEnv {
+            TOKEN: string
+            CLIENTID: string
+            GUILDID: string
+            RULES_ROLE_ID: string
+            LANGUAGE_GROUP_ID: string
+            KEY: string
+        }
     }
-  }
 }

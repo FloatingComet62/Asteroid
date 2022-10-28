@@ -1,56 +1,76 @@
-import { MongoClient, ObjectId } from 'mongodb'
-import { User, UserAttribute } from './interfaces'
+import { MongoClient, ObjectId, Collection, Document } from 'mongodb'
+import { User, Language } from './interfaces'
 
 class Database {
-  client: MongoClient
+    client: MongoClient
+    levelCollection: Collection<Document>
+    languageCollection: Collection<Document>
+    private static instance: Database
 
-  constructor() {
-    this.client = new MongoClient(process.env.KEY || '')
-  }
+    private constructor() {
+        this.client = new MongoClient(process.env.KEY || '')
+        this.levelCollection = this.client.db('userdata').collection('levels')
+        this.languageCollection = this.client.db('languages').collection('languages')
+        this.connect();
+    }
 
-  async connect() {
-    await this.client.connect()
-  }
+    public static getDatabase(): Database {
+        if (!Database.instance) {
+            return new Database()
+        }
+        return Database.instance
+    }
 
-  async close() {
-    await this.client.close()
-  }
+    async connect(): Promise<void> {
+        await this.client.connect()
+    }
 
-  async createUser(userId: string) {
-    const usersCollection = this.client.db('levels').collection('users')
-    const _id = new ObjectId()
-    await usersCollection.insertOne({
-      _id,
-      userId,
-      c: 0,
-      cpp: 0,
-      "c-sharp": 0,
-      rust: 0,
-      java: 0,
-      python: 0,
-      typescript: 0,
-      javascript: 0,
-      general: 0
-    })
+    async close(): Promise<void> {
+        await this.client.close()
+    }
 
-    return _id
-  }
+    async createUser(userId: string): Promise<ObjectId> {
+        const _id = new ObjectId()
+        await this.levelCollection.insertOne({
+            _id,
+            userId,
+            xp: 0
+        })
 
-  async getUser(userId: string) {
-    const usersCollection = this.client.db('levels').collection('users')
-    const userDoc = await usersCollection.findOne({ userId }) as User
-    return userDoc
-  }
+        return _id
+    }
 
-  async addPoints(
-    userId: string,
-    attribute: UserAttribute
-  ) {
-    const usersCollection = this.client.db('levels').collection('users')
-    const obj: any = {}
-    obj[attribute] = 1
-    usersCollection.findOneAndUpdate({ userId }, { $inc: obj })
-  }
+    async getUser(userId: string): Promise<User> {
+        return await this.levelCollection.findOne({ userId }) as User
+    }
+
+    async addPoints(userId: string): Promise<void> {
+        await this.levelCollection.findOneAndUpdate({ userId }, { $inc: { xp: 1 } })
+    }
+
+    async addLang(
+        langName: string,
+        channelId: string,
+        roleId: string
+    ): Promise<ObjectId> {
+        const _id = new ObjectId()
+        await this.languageCollection.insertOne({
+            _id,
+            langName,
+            channelId,
+            roleId
+        })
+
+        return _id
+    }
+
+    async getLang(langName: string): Promise<Language> {
+        return await this.languageCollection.findOne({ langName }) as Language
+    }
+
+    async deleteLang(langName: string): Promise<void> {
+        await this.languageCollection.deleteOne({ langName })
+    }
 }
 
 export default Database
