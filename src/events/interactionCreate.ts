@@ -1,10 +1,12 @@
 import { EmbedBuilder, GuildMemberRoleManager } from 'discord.js'
 import { Interactions, otherOptions } from '../interfaces'
+import Database from '../database'
 
 export const name = 'interactionCreate'
 export const once = false
 
-export async function execute({ client, database }: otherOptions, interaction: Interactions): Promise<void> {
+export async function execute({ client }: otherOptions, interaction: Interactions): Promise<void> {
+    const database = Database.getDatabase()
     if (interaction.isButton()) {
         if (interaction.customId === 'rules') {
             const roleManger = interaction.member?.roles as GuildMemberRoleManager
@@ -23,10 +25,32 @@ export async function execute({ client, database }: otherOptions, interaction: I
         }
     }
 
+    if (interaction.isSelectMenu()) {
+        if (interaction.customId === 'langroles') {
+            for (const languageName of interaction.values) {
+                const { roleId } = await database.getLang(languageName)
+                const member = await interaction.guild?.members.fetch({
+                    user: interaction.user
+                })
+                const role = await interaction.guild?.roles.fetch(roleId)
+                member!.roles.add(role!)
+            }
+
+            interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setTitle('Roles')
+                        .setDescription('Roles updated')
+                        .setColor(0xaaaaaa)
+                ]
+            })
+        }
+    }
+
     if (interaction.isCommand()) {
         const command = client?.commands?.get(interaction.commandName)
         if (!command) return
-        try { command.execute({ client, database }, interaction) }
+        try { command.execute({ client }, interaction) }
         catch (error) {
             console.error(error)
             await interaction.reply({

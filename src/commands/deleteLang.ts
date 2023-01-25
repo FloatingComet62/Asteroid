@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js'
 import { PermissionFlagsBits } from 'discord-api-types/v10'
 import { Interactions, otherOptions } from '../interfaces'
+import Database from '../database'
 
 export const data = new SlashCommandBuilder()
 	.setName('delete-lang')
@@ -12,7 +13,8 @@ export const data = new SlashCommandBuilder()
 	)
 	.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 
-export async function execute({ database }: otherOptions, interaction: Interactions) {
+export async function execute({ }: otherOptions, interaction: Interactions) {
+	const database = Database.getDatabase()
 	if (!interaction.isCommand()) return
 	const languageName = interaction.options.get('language-name')!.value!.toString()
 

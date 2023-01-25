@@ -2,11 +2,9 @@ import { Client, Collection } from 'discord.js'
 import { config } from 'dotenv'
 import { readdirSync } from 'fs'
 import { join } from 'path'
-import { Command, customClient, Event } from './interfaces'
-import db from './database'
+import { Command, customClient, Event, otherOptions } from './interfaces'
 config()
 
-const database = db.getDatabase();
 const client: customClient = new Client({
     intents: [
         "Guilds",
@@ -33,16 +31,12 @@ for (const file of eventFiles) {
     const event: Event = require(filePath)
 
     function eventExecuter(...args: any[]) {
-        let otherOptions = { client, database }
+        let otherOptions: otherOptions = { client }
         event.execute(otherOptions, ...args)
     }
 
     if (event.once) client.once(event.name, eventExecuter)
     else client.on(event.name, eventExecuter)
 }
-
-process.on('exit', () => {
-    database.close() // I know it could have just passed this function as the parameter, but i might want to add more exit stuff later
-})
 
 client.login(process.env.TOKEN)

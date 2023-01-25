@@ -1,75 +1,64 @@
-import { MongoClient, ObjectId, Collection, Document } from 'mongodb'
+import { PrismaClient } from '@prisma/client'
 import { User, Language } from './interfaces'
 
 class Database {
-    client: MongoClient
-    levelCollection: Collection<Document>
-    languageCollection: Collection<Document>
+    client: PrismaClient
     private static instance: Database
 
     private constructor() {
-        this.client = new MongoClient(process.env.KEY)
-        this.levelCollection = this.client.db('userdata').collection('levels')
-        this.languageCollection = this.client.db('languages').collection('languages')
-        this.connect();
+        this.client = new PrismaClient()
     }
 
     public static getDatabase(): Database {
-        if (!Database.instance) {
-            return new Database()
-        }
+        if (!Database.instance) Database.instance = new Database()
         return Database.instance
     }
 
-    async connect(): Promise<void> {
-        await this.client.connect()
-    }
-
-    async close(): Promise<void> {
-        await this.client.close()
-    }
-
-    async createUser(userId: string): Promise<ObjectId> {
-        const _id = new ObjectId()
-        await this.levelCollection.insertOne({
-            _id,
-            userId,
-            xp: 0
+    async createUser(userId: string): Promise<void> {
+        await this.client.user.create({
+            data: {
+                xp: 0,
+                userId,
+                updated_at: new Date()
+            }
         })
-
-        return _id
     }
 
     async getUser(userId: string): Promise<User> {
-        return await this.levelCollection.findOne({ userId }) as User
+        return await this.client.user.findUnique({ where: { userId } }) as User
     }
 
     async addPoints(userId: string): Promise<void> {
-        await this.levelCollection.findOneAndUpdate({ userId }, { $inc: { xp: 1 } })
+        await this.client.user.update({
+            where: { userId },
+            data: {
+                xp: { increment: 1 },
+                updated_at: new Date()
+            }
+        })
     }
 
     async addLang(
         langName: string,
         channelId: string,
         roleId: string
-    ): Promise<ObjectId> {
-        const _id = new ObjectId()
-        await this.languageCollection.insertOne({
-            _id,
-            langName,
-            channelId,
-            roleId
+    ): Promise<void> {
+        await this.client.language.create({
+            data: {
+                name: langName,
+                channelId,
+                roleId,
+                updated_at: new Date()
+            }
         })
-
-        return _id
     }
 
     async getLang(langName: string): Promise<Language> {
-        return await this.languageCollection.findOne({ langName }) as Language
+        return await this.client.language.findUnique({ where: { name: langName } }) as Language
     }
 
     async deleteLang(langName: string): Promise<void> {
-        await this.languageCollection.deleteOne({ langName })
+        await this.client.language.delete({ where: { name: langName } })
     }
 }
 

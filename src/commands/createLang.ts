@@ -1,6 +1,7 @@
 import { HexColorString, SlashCommandBuilder } from 'discord.js'
 import { PermissionFlagsBits } from 'discord-api-types/v10'
 import { Interactions, otherOptions } from '../interfaces'
+import Database from '../database'
 
 export const data = new SlashCommandBuilder()
     .setName('create-lang')
@@ -11,15 +12,22 @@ export const data = new SlashCommandBuilder()
         .setRequired(true)
     )
     .addStringOption(option => option
+        .setName('display-name')
+        .setDescription('Display name of the language')
+        .setRequired(true)
+    )
+    .addStringOption(option => option
         .setName('language-accent-color')
         .setDescription('Hex Color')
         .setRequired(true)
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 
-export async function execute({ database }: otherOptions, interaction: Interactions) {
+export async function execute({ }: otherOptions, interaction: Interactions) {
+    const database = Database.getDatabase()
     if (!interaction.isCommand()) return
     const languageName = interaction.options.get('language-name')!.value!.toString()
+    const displayName = interaction.options.get('display-name')!.value!.toString()
     const color = interaction.options.get('language-accent-color')!.value as HexColorString
 
     if (languageName === 'general') {
@@ -29,13 +37,13 @@ export async function execute({ database }: otherOptions, interaction: Interacti
 
     // Init
     let error = false
-    let content = `Adding Language ${languageName}`
+    let content = `Adding Language ${displayName}`
     await interaction.reply({ content })
 
     // Channel
     const channel = await interaction.guild?.channels.create({
         name: languageName,
-        parent: '1015525181906767892'
+        parent: process.env.LANGUAGE_CATEGORY_ID
     })
     if (channel) content += `\n:white_check_mark: Created Channel <#${channel.id}>`
     else {
@@ -48,7 +56,7 @@ export async function execute({ database }: otherOptions, interaction: Interacti
 
     // Role integration
     const role = await interaction.guild?.roles.create({
-        name: languageName,
+        name: displayName,
         color
     })
 

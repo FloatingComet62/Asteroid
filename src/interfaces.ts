@@ -5,13 +5,11 @@ import {
     Collection,
     Interaction,
 } from 'discord.js'
-import { ObjectId } from 'mongodb'
 import Database from './database'
 
 export interface customClient extends Client { commands?: Collection<string, Command> }
 export interface otherOptions {
     client: customClient
-    database: Database
 }
 export interface Command {
     data: SlashCommandBuilder
@@ -26,16 +24,18 @@ export interface Event {
 export type Interactions = Interaction<CacheType>
 
 export interface User {
-    _id: ObjectId
     userId: string
     xp: number
+    created_at: Date
+    updated_at: Date
 }
 
 export interface Language {
-    _id: ObjectId
     name: string
     roleId: string
     channelId: string
+    created_at: Date
+    updated_at: Date
 }
 
 declare global {
@@ -46,6 +46,8 @@ declare global {
             GUILDID: string
             RULES_ROLE_ID: string
             KEY: string
+            LANGUAGE_CATEGORY_ID: string
+            DATABASE_URL: string
         }
     }
 }
