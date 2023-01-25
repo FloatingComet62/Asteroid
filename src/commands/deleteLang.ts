@@ -6,20 +6,26 @@ import Database from '../database'
 export const data = new SlashCommandBuilder()
 	.setName('delete-lang')
 	.setDescription(`Delete a language from the server`)
-	.addStringOption(option => option
-		.setName('language-name')
-		.setDescription('Language\'s name')
-		.setRequired(true)
+	.addStringOption(option =>
+		option
+			.setName('language-name')
+			.setDescription("Language's name")
+			.setRequired(true),
 	)
 	.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 
-export async function execute({ }: otherOptions, interaction: Interactions) {
+export async function execute({}: otherOptions, interaction: Interactions) {
 	const database = Database.getDatabase()
 	if (!interaction.isCommand()) return
-	const languageName = interaction.options.get('language-name')!.value!.toString()
+	const languageName = interaction.options
+		.get('language-name')!
+		.value!.toString()
 
 	if (languageName === 'general') {
-		interaction.reply({ content: `Language Name can't be general`, ephemeral: true })
+		interaction.reply({
+			content: `Language Name can't be general`,
+			ephemeral: true,
+		})
 		return
 	}
 
@@ -31,16 +37,16 @@ export async function execute({ }: otherOptions, interaction: Interactions) {
 	const languageData = await database.getLang(languageName)
 
 	// Channel Segregation
-	const targetChannel = await interaction.guild?.channels.fetch(languageData.channelId)
+	const targetChannel = await interaction.guild?.channels.fetch(
+		languageData.channelId,
+	)
 	if (!targetChannel) {
 		content += `\n:x: Channel #${languageName} not found`
 		error = true
-	}
-	else if (!targetChannel.deletable) {
+	} else if (!targetChannel.deletable) {
 		content += `\n:x: Channel <#${targetChannel.id}> is not deletable`
 		error = true
-	}
-	else {
+	} else {
 		await targetChannel.delete()
 		content += `\n:white_check_mark: Channel deleted`
 	}
