@@ -8,11 +8,13 @@
 		"command-deploy": "node dist/deploy-commands.js",
 		"watch": "tsc -w",
 		"build": "tsc",
-		"serve": "tsc && yarn command-deploy && yarn start",
+		"serve": "yarn db:generate && yarn build && yarn command-deploy && yarn start",
 		"db:sync:push": "prisma db push",
 		"db:sync:pull": "prisma db pull",
 		"db:visual": "prisma studio",
-		"db:generate": "prisma generate"
+		"db:generate": "prisma generate",
+		"docker:build": "docker build . -t asteroid",
+		"docker:run": "docker run --name asteroid asteroid"
 	},
 	"dependencies": {
 		"@discordjs/builders": "^0.13.0",

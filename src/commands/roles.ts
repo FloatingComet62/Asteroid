@@ -10,7 +10,7 @@ export const data = new SlashCommandBuilder()
 	.setName('roles')
 	.setDescription('temporary slash command')
 
-export async function execute({}: otherOptions, interaction: Interactions) {
+export async function execute({ }: otherOptions, interaction: Interactions) {
 	if (!interaction.isCommand()) return
 
 	const row = new ActionRowBuilder<SelectMenuBuilder>().addComponents(

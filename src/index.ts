@@ -3,7 +3,13 @@ import { config } from 'dotenv'
 import { readdirSync } from 'fs'
 import { join } from 'path'
 import { Command, customClient, Event } from './interfaces'
+
 config()
+
+// I know, very safe and creative
+if (process.env.NODE_ENV !== 'production')
+	process.env.DATABASE_URL = process.env.DATABASE_URL.replace('host.docker.internal', 'localhost')
+
 
 const client: customClient = new Client({
 	intents: ['Guilds', 'GuildMessages', 'GuildMembers'],

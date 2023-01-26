@@ -43,6 +43,7 @@ declare global {
 			RULES_ROLE_ID: string
 			LANGUAGE_CATEGORY_ID: string
 			DATABASE_URL: string
+			NODE_ENV: string
 		}
 	}
 }
